@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Know Joke — Join the Waitlist</title>
+<style>
+  :root { --ink: #141414; --paper: #f4efe4; --red: #c1272d; --gold: #d9a441; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--paper); color: var(--ink);
+         font-family: Georgia, 'Times New Roman', serif; min-height: 100vh;
+         display: flex; align-items: center; justify-content: center; padding: 24px; }
+  .card { max-width: 520px; width: 100%; background: #fffdf6;
+          border: 3px solid var(--ink); box-shadow: 8px 8px 0 var(--ink);
+          padding: 40px 36px; text-align: center; }
+  .kicker { letter-spacing: .35em; font-size: 12px; text-transform: uppercase; color: var(--red); font-weight: bold; }
+  h1 { font-size: 42px; margin: 12px 0 8px; line-height: 1.05; }
+  h1 em { color: var(--red); font-style: normal; }
+  p.sub { font-size: 17px; line-height: 1.5; margin: 0 0 24px; }
+  label { display: block; text-align: left; font-size: 13px; letter-spacing: .12em;
+          text-transform: uppercase; margin: 14px 0 6px; font-weight: bold; }
+  input { width: 100%; padding: 14px; font-size: 17px; font-family: inherit;
+          border: 2px solid var(--ink); background: #fff; }
+  input:focus { outline: 3px solid var(--gold); }
+  button { margin-top: 22px; width: 100%; padding: 16px; font-size: 19px; font-family: inherit;
+           font-weight: bold; letter-spacing: .06em; background: var(--red); color: #fff;
+           border: 3px solid var(--ink); box-shadow: 5px 5px 0 var(--ink); cursor: pointer; }
+  button:active { transform: translate(3px, 3px); box-shadow: 2px 2px 0 var(--ink); }
+  button:disabled { opacity: .55; cursor: wait; }
+  .msg { margin-top: 18px; font-size: 16px; min-height: 24px; }
+  .msg.ok { color: #1d6b1d; font-weight: bold; }
+  .msg.err { color: var(--red); font-weight: bold; }
+  .fine { margin-top: 26px; font-size: 13px; color: #5c5c5c; }
+  .burst { display: inline-block; background: var(--gold); border: 2px solid var(--ink);
+           border-radius: 50%; width: 92px; height: 92px; line-height: 88px; font-weight: bold;
+           font-size: 15px; transform: rotate(-8deg); margin-bottom: 8px; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="burst">BETA</div>
+    <div class="kicker">Know Joke University</div>
+    <h1>Get in on the <em>joke</em>.</h1>
+    <p class="sub">The comedy school of the future is enrolling its first class.
+       Drop your email and we'll save your seat.</p>
+    <form id="wl">
+      <label for="name">Stage name</label>
+      <input id="name" type="text" autocomplete="name" placeholder="e.g. Road Comic">
+      <label for="email">Email</label>
+      <input id="email" type="email" required autocomplete="email" placeholder="you@example.com">
+      <button id="btn" type="submit">Join the waitlist</button>
+      <div class="msg" id="msg" role="status"></div>
+    </form>
+    <p class="fine">One email per comic — duplicates are politely ignored.<br>
+       Know Joke &middot; Jokebook LLC</p>
+  </div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script>
+  firebase.initializeApp({
+    apiKey: "AIzaSyAWb2mHqmxqjVvmmz7dC4U6uE3IbnxWkT",
+    authDomain: "know-joke.firebaseapp.com",
+    projectId: "know-joke",
+    storageBucket: "know-joke.firebasestorage.app",
+    messagingSenderId: "155340696918",
+    appId: "1:155340696918:web:e13338cef72fea88197af7"
+  });
+  const db = firebase.firestore();
+  const form = document.getElementById('wl');
+  const msg = document.getElementById('msg');
+  const btn = document.getElementById('btn');
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = document.getElementById('email').value.trim().toLowerCase();
+    const name = document.getElementById('name').value.trim();
+    if (!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+      msg.className = 'msg err'; msg.textContent = 'Give us a real email, champ.';
+      return;
+    }
+    btn.disabled = true; btn.textContent = 'Saving your seat…';
+    msg.className = 'msg'; msg.textContent = '';
+    try {
+      const col = db.collection('waitlist');
+      const existing = await col.where('email', '==', email).limit(1).get();
+      if (!existing.empty) {
+        const d = existing.docs[0].data();
+        msg.className = 'msg ok';
+        msg.textContent = "You're already on the list" + (d.position ? ' — seat #' + d.position + '!' : '!');
+      } else {
+        const countSnap = await col.count().get();
+        const ref = await col.add({
+          email, name: name || null, position: countSnap.data().count + 1,
+          invited: false, status: 'pending',
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        const snap = await ref.get();
+        msg.className = 'msg ok';
+        msg.textContent = "You're in! Seat #" + snap.data().position + ' reserved.';
+        form.reset();
+      }
+    } catch (err) {
+      console.error(err);
+      msg.className = 'msg err';
+      msg.textContent = 'The spotlight missed — try again in a moment.';
+    } finally {
+      btn.disabled = false; btn.textContent = 'Join the waitlist';
+    }
+  });
+</script>
+</body>
+</html>
