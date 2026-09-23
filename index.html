@@ -12,11 +12,14 @@
          display: flex; align-items: center; justify-content: center; padding: 24px; }
   .card { max-width: 520px; width: 100%; background: #fffdf6;
           border: 3px solid var(--ink); box-shadow: 8px 8px 0 var(--ink);
-          padding: 40px 36px; text-align: center; }
-  .kicker { letter-spacing: .35em; font-size: 12px; text-transform: uppercase; color: var(--red); font-weight: bold; }
-  h1 { font-size: 42px; margin: 12px 0 8px; line-height: 1.05; }
+          padding: 40px 36px 32px; text-align: center; }
+  .kicker { letter-spacing: .35em; font-size: 12px; text-transform: uppercase;
+            color: var(--red); font-weight: bold; }
+  .stars { color: var(--gold); font-size: 18px; letter-spacing: .5em;
+           margin: 10px 0 2px; text-shadow: 1px 1px 0 var(--ink); }
+  h1 { font-size: 44px; margin: 8px 0 10px; line-height: 1.05; }
   h1 em { color: var(--red); font-style: normal; }
-  p.sub { font-size: 17px; line-height: 1.5; margin: 0 0 24px; }
+  p.sub { font-size: 17px; line-height: 1.55; margin: 0 0 26px; }
   label { display: block; text-align: left; font-size: 13px; letter-spacing: .12em;
           text-transform: uppercase; margin: 14px 0 6px; font-weight: bold; }
   input { width: 100%; padding: 14px; font-size: 17px; font-family: inherit;
@@ -24,13 +27,16 @@
   input:focus { outline: 3px solid var(--gold); }
   button { margin-top: 22px; width: 100%; padding: 16px; font-size: 19px; font-family: inherit;
            font-weight: bold; letter-spacing: .06em; background: var(--red); color: #fff;
-           border: 3px solid var(--ink); box-shadow: 5px 5px 0 var(--ink); cursor: pointer; }
+           border: 3px solid var(--ink); box-shadow: 5px 5px 0 var(--ink); cursor: pointer;
+           transition: filter .12s ease; }
+  button:hover:not(:disabled) { filter: brightness(1.08); }
   button:active { transform: translate(3px, 3px); box-shadow: 2px 2px 0 var(--ink); }
   button:disabled { opacity: .55; cursor: wait; }
-  .msg { margin-top: 18px; font-size: 16px; min-height: 24px; }
+  .msg { margin-top: 18px; font-size: 16px; min-height: 24px; line-height: 1.45; }
   .msg.ok { color: #1d6b1d; font-weight: bold; }
   .msg.err { color: var(--red); font-weight: bold; }
-  .fine { margin-top: 26px; font-size: 13px; color: #5c5c5c; }
+  .perforation { border-top: 2px dashed var(--ink); margin: 28px -36px 0; opacity: .55; }
+  .fine { margin-top: 16px; font-size: 13px; color: #5c5c5c; line-height: 1.6; }
   .burst { display: inline-block; background: var(--gold); border: 2px solid var(--ink);
            border-radius: 50%; width: 92px; height: 92px; line-height: 88px; font-weight: bold;
            font-size: 15px; transform: rotate(-8deg); margin-bottom: 8px; }
@@ -40,17 +46,19 @@
   <div class="card">
     <div class="burst">BETA</div>
     <div class="kicker">Know Joke University</div>
+    <div class="stars" aria-hidden="true">&#9733;&#9733;&#9733;</div>
     <h1>Get in on the <em>joke</em>.</h1>
     <p class="sub">The comedy school of the future is enrolling its first class.
-       Drop your email and we'll save your seat.</p>
+       Drop your email and be first through the door when it opens.</p>
     <form id="wl">
       <label for="name">Stage name</label>
-      <input id="name" type="text" autocomplete="name" placeholder="e.g. Road Comic">
+      <input id="name" type="text" autocomplete="name" maxlength="120" placeholder="e.g. Road Comic">
       <label for="email">Email</label>
       <input id="email" type="email" required autocomplete="email" placeholder="you@example.com">
       <button id="btn" type="submit">Join the waitlist</button>
       <div class="msg" id="msg" role="status"></div>
     </form>
+    <div class="perforation" aria-hidden="true"></div>
     <p class="fine">One entry per comic, please.<br>
        Know Joke &middot; Jokebook LLC</p>
   </div>
@@ -79,7 +87,7 @@
       msg.className = 'msg err'; msg.textContent = 'Give us a real email, champ.';
       return;
     }
-    btn.disabled = true; btn.textContent = 'Saving your seat…';
+    btn.disabled = true; btn.textContent = 'Adding you to the list…';
     msg.className = 'msg'; msg.textContent = '';
     try {
       // Write-only: no reads (no listing, no dupe check) — Firestore rules deny all reads.
