@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Know Joke University</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IM+Fell+English+SC&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Courier+Prime:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --font-display: "Fraunces", "Libre Baskerville", Georgia, serif;
+      --font-playbill: "IM Fell English SC", "Libre Baskerville", Georgia, serif;
+      --font-body: "Libre Baskerville", Georgia, "Times New Roman", serif;
+      --font-typewriter: "Courier Prime", "Courier New", monospace;
+      --ink: #f5f0e6;
+      --ink-muted: rgba(245, 240, 230, 0.62);
+      --marquee-glow: 0 1px 0 rgba(255, 248, 220, 0.22), 0 0 14px rgba(255, 235, 190, 0.28), 0 0 32px rgba(255, 220, 160, 0.12);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    body {
+      background: #000000;
+      color: var(--ink);
+      font-family: var(--font-body);
+      font-variant-numeric: oldstyle-nums;
+      text-rendering: optimizeLegibility;
+      -webkit-font-smoothing: antialiased;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100dvh;
+      height: 100dvh;
+      margin: 0;
+      padding: clamp(0.75rem, 3vw, 1.5rem);
+      overflow: hidden;
+    }
+
+    .stage {
+      width: min(100%, 420px);
+      height: min(640px, calc(100dvh - 1.5rem));
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      animation: fadeIn 4s ease-in-out;
+    }
+
+    .hero {
+      flex: 0 0 auto;
+      width: 100%;
+      height: clamp(240px, 42dvh, 340px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .noe-wrapper {
+      position: relative;
+      display: inline-block;
+      line-height: 0;
+    }
+
+    .action-panel {
+      flex: 1 1 auto;
+      width: 100%;
+      min-height: 230px;
+      position: relative;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding-top: 0.25rem;
+    }
+
+    .action-layer {
+      width: 100%;
+      transition: opacity 0.28s ease, transform 0.28s ease;
+    }
+
+    .action-layer.is-hidden {
+      opacity: 0;
+      pointer-events: none;
+      position: absolute;
+      inset: 0;
+      transform: translateY(4px);
+    }
+
+    .action-layer.is-visible {
+      opacity: 1;
+      pointer-events: auto;
+      position: relative;
+      transform: translateY(0);
+    }
+
+    .action-layer.is-visible.waitlist-form-wrap {
+      position: absolute;
+      inset: 0;
+    }
+
+    .star-field {
+      position: absolute;
+      inset: -120px;
+      z-index: -1;
+      pointer-events: none;
+      overflow: visible;
+    }
+
+    .star {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      color: #fff8e7;
+      font-family: var(--font-playbill);
+      font-size: var(--size);
+      line-height: 1;
+      text-shadow: 0 0 8px rgba(255, 248, 220, 0.95), 0 0 18px rgba(255, 235, 190, 0.45);
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(0.25) rotate(var(--rotate));
+      animation: flyStar var(--duration) ease-out infinite;
+      animation-delay: var(--delay);
+    }
+
+    .noe-wrapper::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 420px;
+      height: 420px;
+      transform: translate(-50%, -55%);
+      background:
+        repeating-conic-gradient(
+          from -10deg,
+          rgba(255, 255, 255, 0.32) 0deg,
+          rgba(255, 255, 255, 0.08) 7deg,
+          transparent 15deg,
+          transparent 26deg
+        ),
+        radial-gradient(circle, rgba(255, 255, 255, 0.34) 0%, rgba(255, 255, 255, 0.1) 32%, transparent 68%);
+      border-radius: 50%;
+      z-index: -1;
+      filter: blur(18px);
+      opacity: 0.62;
+      animation: rotateGlow 22s linear infinite;
+    }
+
+    img.noe {
+      width: min(320px, 68vw);
+      max-height: clamp(220px, 38dvh, 320px);
+      height: auto;
+      object-fit: contain;
+      filter: drop-shadow(0 0 10px rgba(0,0,0,1));
+    }
+
+    .trigger-wrap {
+      width: 100%;
+      text-align: center;
+      padding-top: 0.35rem;
+    }
+
+    .waitlist-trigger,
+    .waitlist-form button[type="submit"] {
+      color: var(--ink);
+      font-family: var(--font-playbill);
+      font-size: 1.05rem;
+      font-weight: 400;
+      font-style: normal;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      opacity: 0.92;
+      text-shadow: var(--marquee-glow);
+      padding: 0.35rem 0;
+    }
+
+    .waitlist-trigger:disabled,
+    .waitlist-trigger.is-complete {
+      cursor: default;
+      opacity: 0.88;
+      text-decoration: none;
+    }
+
+    .waitlist-trigger.is-complete:hover,
+    .waitlist-trigger.is-complete:focus-visible {
+      opacity: 0.88;
+      text-decoration: none;
+    }
+
+    .waitlist-trigger:hover:not(.is-complete),
+    .waitlist-trigger:focus-visible:not(.is-complete),
+    .waitlist-form button[type="submit"]:hover:not(:disabled),
+    .waitlist-form button[type="submit"]:focus-visible:not(:disabled) {
+      opacity: 1;
+      text-decoration: underline;
+      text-underline-offset: 0.35em;
+    }
+
+    .waitlist-form {
+      width: 100%;
+      text-align: left;
+      border: none;
+      background: transparent;
+      padding: 0;
+    }
+
+    .waitlist-form legend {
+      font-family: var(--font-playbill);
+      font-size: 0.95rem;
+      font-weight: 400;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--ink);
+      margin-bottom: 1rem;
+      padding: 0;
+      text-align: center;
+      width: 100%;
+      text-shadow: var(--marquee-glow);
+    }
+
+    .field {
+      display: block;
+      margin-bottom: 0.65rem;
+    }
+
+    .field span {
+      display: block;
+      font-family: var(--font-playbill);
+      font-size: 0.72rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+      margin-bottom: 0.35rem;
+    }
+
+    .field input {
+      width: 100%;
+      border: 1px solid rgba(255, 235, 190, 0.28);
+      background: rgba(0, 0, 0, 0.55);
+      color: var(--ink);
+      font-family: var(--font-typewriter);
+      font-size: 0.92rem;
+      letter-spacing: 0.02em;
+      padding: 0.65rem 0.75rem;
+      outline: none;
+    }
+
+    .field input::placeholder {
+      color: rgba(245, 240, 230, 0.32);
+      font-style: italic;
+    }
+
+    .field input:focus {
+      border-color: rgba(255, 255, 255, 0.65);
+      background: rgba(0, 0, 0, 0.75);
+    }
+
+    .field input:disabled,
+    .waitlist-form button[type="submit"]:disabled {
+      opacity: 0.55;
+      cursor: wait;
+    }
+
+    .form-actions {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.75rem;
+      margin-top: 1rem;
+    }
+
+    .form-message {
+      font-family: var(--font-display);
+      font-size: 0.88rem;
+      font-weight: 500;
+      font-variation-settings: "SOFT" 72, "WONK" 1;
+      line-height: 1.55;
+      margin: 0;
+      text-align: center;
+      color: var(--ink-muted);
+    }
+
+    .form-message.error {
+      color: #ffb4b4;
+    }
+
+    .form-message.success {
+      color: var(--ink);
+    }
+
+    .form-cancel {
+      font-family: var(--font-playbill);
+      font-size: 0.78rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+    }
+
+    .form-cancel:hover,
+    .form-cancel:focus-visible {
+      color: var(--ink);
+    }
+
+    @keyframes fadeIn {
+      0% { opacity: 0; }
+      100% { opacity: 1; }
+    }
+
+    @keyframes rotateGlow {
+      from { transform: translate(-50%, -55%) rotate(0deg); }
+      to { transform: translate(-50%, -55%) rotate(360deg); }
+    }
+
+    @keyframes flyStar {
+      0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.15) rotate(var(--rotate));
+      }
+      18%, 58% {
+        opacity: 0.95;
+      }
+      100% {
+        opacity: 0;
+        transform: translate(calc(-50% + var(--x)), calc(-50% + var(--y))) scale(1) rotate(calc(var(--rotate) + 75deg));
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="stage">
+    <div class="hero">
+      <div class="noe-wrapper">
+        <div class="star-field" aria-hidden="true">
+          <span class="star" style="--x:-150px; --y:-120px; --size:18px; --rotate:12deg; --duration:3.4s; --delay:-0.2s;">✦</span>
+          <span class="star" style="--x:-88px; --y:-178px; --size:13px; --rotate:36deg; --duration:3.1s; --delay:-1.4s;">✧</span>
+          <span class="star" style="--x:38px; --y:-158px; --size:17px; --rotate:-18deg; --duration:3.7s; --delay:-0.8s;">✦</span>
+          <span class="star" style="--x:142px; --y:-116px; --size:14px; --rotate:44deg; --duration:3.2s; --delay:-2.1s;">✧</span>
+          <span class="star" style="--x:178px; --y:-18px; --size:19px; --rotate:-32deg; --duration:3.6s; --delay:-1s;">✦</span>
+          <span class="star" style="--x:116px; --y:112px; --size:12px; --rotate:22deg; --duration:2.9s; --delay:-0.5s;">✧</span>
+          <span class="star" style="--x:22px; --y:164px; --size:16px; --rotate:-8deg; --duration:3.5s; --delay:-1.8s;">✦</span>
+          <span class="star" style="--x:-104px; --y:128px; --size:13px; --rotate:58deg; --duration:3.3s; --delay:-2.5s;">✧</span>
+          <span class="star" style="--x:-176px; --y:28px; --size:18px; --rotate:-26deg; --duration:3.8s; --delay:-1.2s;">✦</span>
+        </div>
+        <img src="https://knowjoke.lol/noe-grad-white.png" alt="Noe" class="noe" />
+      </div>
+    </div>
+
+    <div class="action-panel">
+      <div class="action-layer trigger-wrap is-visible" id="trigger-wrap">
+        <button type="button" class="waitlist-trigger" id="waitlist-trigger" aria-expanded="false" aria-controls="waitlist-form">
+          Join Waitlist
+        </button>
+      </div>
+
+      <div class="action-layer waitlist-form-wrap is-hidden" id="form-wrap" aria-hidden="true">
+        <form class="waitlist-form" id="waitlist-form" novalidate>
+          <fieldset style="border: none; margin: 0; padding: 0;">
+            <legend>Early access</legend>
+
+            <label class="field">
+              <span>Email</span>
+              <input type="email" name="email" id="waitlist-email" autocomplete="email" required placeholder="you@example.com" />
+            </label>
+
+            <label class="field">
+              <span>Name (optional)</span>
+              <input type="text" name="name" id="waitlist-name" autocomplete="name" placeholder="Stage name or legal name" />
+            </label>
+
+            <p class="form-message" id="form-message" hidden role="status" aria-live="polite"></p>
+
+            <div class="form-actions">
+              <button type="submit" id="waitlist-submit">Send</button>
+              <button type="button" class="form-cancel" id="waitlist-cancel">Back</button>
+            </div>
+          </fieldset>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <script>
+    // Firestore-direct waitlist cutover (2026-09-24): the form writes straight
+    // to the know-joke project's waitlist collection — no Cloud Run backend needed.
+    // apiKey is injected at deploy time (see DEPLOY.md); the rest matches the
+    // interim waitlist page's config exactly.
+    firebase.initializeApp({
+      apiKey: "__PASTE_KEY_HERE__",
+      authDomain: "know-joke.firebaseapp.com",
+      projectId: "know-joke",
+      storageBucket: "know-joke.firebasestorage.app",
+      messagingSenderId: "155340696918",
+      appId: "1:155340696918:web:e13338cef72fea88197af7"
+    });
+    var KJ_DB = firebase.firestore();
+  </script>
+  <script>
+    (function () {
+      var trigger = document.getElementById('waitlist-trigger');
+      var triggerWrap = document.getElementById('trigger-wrap');
+      var formWrap = document.getElementById('form-wrap');
+      var form = document.getElementById('waitlist-form');
+      var cancel = document.getElementById('waitlist-cancel');
+      var submitBtn = document.getElementById('waitlist-submit');
+      var message = document.getElementById('form-message');
+      var emailInput = document.getElementById('waitlist-email');
+      var nameInput = document.getElementById('waitlist-name');
+
+      function showMessage(text, type) {
+        message.hidden = false;
+        message.textContent = text;
+        message.className = 'form-message' + (type ? ' ' + type : '');
+      }
+
+      function clearMessage() {
+        message.hidden = true;
+        message.textContent = '';
+        message.className = 'form-message';
+      }
+
+      function showForm() {
+        triggerWrap.classList.remove('is-visible');
+        triggerWrap.classList.add('is-hidden');
+        formWrap.classList.remove('is-hidden');
+        formWrap.classList.add('is-visible');
+        formWrap.setAttribute('aria-hidden', 'false');
+        trigger.setAttribute('aria-expanded', 'true');
+        clearMessage();
+        emailInput.focus();
+      }
+
+      function showTrigger() {
+        formWrap.classList.remove('is-visible');
+        formWrap.classList.add('is-hidden');
+        triggerWrap.classList.remove('is-hidden');
+        triggerWrap.classList.add('is-visible');
+        formWrap.setAttribute('aria-hidden', 'true');
+        trigger.setAttribute('aria-expanded', 'false');
+        clearMessage();
+        form.reset();
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Send';
+        cancel.textContent = 'Back';
+        emailInput.disabled = false;
+        nameInput.disabled = false;
+      }
+
+      function completeWaitlist() {
+        showTrigger();
+        trigger.textContent = 'Coming Soon';
+        trigger.classList.add('is-complete');
+        trigger.disabled = true;
+        trigger.setAttribute('aria-disabled', 'true');
+      }
+
+      trigger.addEventListener('click', function () {
+        if (!trigger.classList.contains('is-complete')) {
+          showForm();
+        }
+      });
+      cancel.addEventListener('click', showTrigger);
+
+      form.addEventListener('submit', function (event) {
+        event.preventDefault();
+        clearMessage();
+
+        var email = emailInput.value.trim();
+        var name = nameInput.value.trim();
+
+        if (!email) {
+          showMessage('Please enter your email.', 'error');
+          emailInput.focus();
+          return;
+        }
+
+        submitBtn.disabled = true;
+        emailInput.disabled = true;
+        nameInput.disabled = true;
+        submitBtn.textContent = 'Sending…';
+
+        KJ_DB.collection('waitlist').add({
+          email: email.toLowerCase(),
+          name: name || null,
+          invited: false,
+          status: 'pending',
+          source: 'knowjoke.lol',
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        })
+          .then(function () {
+            completeWaitlist();
+          })
+          .catch(function () {
+            showMessage('Could not join the waitlist. Try again.', 'error');
+            submitBtn.disabled = false;
+            emailInput.disabled = false;
+            nameInput.disabled = false;
+            submitBtn.textContent = 'Send';
+          });
+      });
+    })();
+  </script>
+</body>
+</html>
