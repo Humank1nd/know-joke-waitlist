@@ -40,7 +40,10 @@
   .burst { display: inline-block; background: var(--gold); border: 2px solid var(--ink);
            border-radius: 50%; width: 92px; height: 92px; line-height: 88px; font-weight: bold;
            font-size: 15px; transform: rotate(-8deg); margin-bottom: 8px; }
-  .noe { display: block; width: 230px; max-width: 70%; height: auto; margin: 4px auto 22px; }
+  .noe-wrap { width: 330px; max-width: 92%; aspect-ratio: 1; margin: 10px auto 20px;
+           border-radius: 50%; display: flex; align-items: center; justify-content: center;
+           background: radial-gradient(circle, #f9e2a8 0%, #f9e2a8 42%, rgba(249,226,168,0) 70%); }
+  .noe { display: block; width: 265px; max-width: 84%; height: auto; }
 </style>
 </head>
 <body>
@@ -49,9 +52,11 @@
     <div class="kicker">Know Joke University</div>
     <div class="stars" aria-hidden="true">&#9733;&#9733;&#9733;</div>
     <h1>Get in on the <em>joke</em>.</h1>
+    <div class="noe-wrap">
+      <img class="noe" src="noe-mascot.png" alt="Noé the Clown, your guide to Know Joke" width="460" height="384">
+    </div>
     <p class="sub">The comedy school of the future is enrolling its first class.
        Drop your email and be first through the door when it opens.</p>
-    <img class="noe" src="noe-mascot.png" alt="Noé the Clown, your guide to Know Joke" width="460" height="384">
     <form id="wl">
       <label for="name">Stage name</label>
       <input id="name" type="text" autocomplete="name" maxlength="120" placeholder="e.g. Road Comic">
