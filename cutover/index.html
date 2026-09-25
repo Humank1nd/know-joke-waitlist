@@ -289,6 +289,10 @@
       color: var(--ink);
     }
 
+    #waitlist-confirm {
+      margin-top: 0.9rem;
+    }
+
     .form-cancel {
       font-family: var(--font-playbill);
       font-size: 0.78rem;
@@ -355,6 +359,7 @@
         <button type="button" class="waitlist-trigger" id="waitlist-trigger" aria-expanded="false" aria-controls="waitlist-form">
           Join Waitlist
         </button>
+        <p class="form-message success" id="waitlist-confirm" hidden role="status">You're on the list. We'll be in touch soon.</p>
       </div>
 
       <div class="action-layer waitlist-form-wrap is-hidden" id="form-wrap" aria-hidden="true">
@@ -412,6 +417,7 @@
       var message = document.getElementById('form-message');
       var emailInput = document.getElementById('waitlist-email');
       var nameInput = document.getElementById('waitlist-name');
+      var confirmMsg = document.getElementById('waitlist-confirm');
 
       function showMessage(text, type) {
         message.hidden = false;
@@ -450,10 +456,12 @@
         cancel.textContent = 'Back';
         emailInput.disabled = false;
         nameInput.disabled = false;
+        confirmMsg.hidden = true;
       }
 
       function completeWaitlist() {
         showTrigger();
+        confirmMsg.hidden = false;
         trigger.textContent = 'Coming Soon';
         trigger.classList.add('is-complete');
         trigger.disabled = true;
